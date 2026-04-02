@@ -12,8 +12,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def read_root():
+    return {"message": "Scan Merge API is running"}
+
 @app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "service": "scan-merge-api"}
 
 app.include_router(router)
