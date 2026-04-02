@@ -1,8 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import router
 
 app = FastAPI(title="Scan Merge API")
+
+# 15MB limit (in bytes)
+MAX_UPLOAD_SIZE = 15 * 1024 * 1024
+
+@app.middleware("http")
+async def limit_upload_size(request: Request, call_next):
+    # Check Content-Length header
+    content_length = request.headers.get("Content-Length")
+    if content_length and int(content_length) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=413, detail="File too large (Max: 15MB)")
+    
+    return await call_next(request)
 
 app.add_middleware(
     CORSMiddleware,
